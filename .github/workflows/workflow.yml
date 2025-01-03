@@ -1,0 +1,20 @@
+name: Slack Notification for Pull Request
+
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+jobs:
+  slack_notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Notify on PR
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -d '{"text": "PR <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}> by ${{ github.event.pull_request.user.login }}", "icon_emoji": "${{ secrets.SLACK_ICON }}", "channel": "${{ secrets.MY_SLACK_CHANNEL_ID }}"}' \
+          -X POST \
+          $SLACK_WEBHOOK_URL
